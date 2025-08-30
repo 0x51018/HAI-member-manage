@@ -8,6 +8,7 @@
 - 회원 API(`/members`): 목록 조회, 상세, 메모 조회/작성
 - Import v1(`/import/spreadsheet/v1`): 스프레드시트 행을 파싱해 Member/MemberTerm/Section 업서트
 - 학기·분반·팀 API: 학기 목록/생성, MeetingDay 일괄 등록, 분반 생성·조회, 팀 생성 및 리더 지정
+- Next.js 15 웹 앱: 로그인 폼과 회원 목록/상세 페이지를 React Query·React Hook Form·Zod와 연동 (React 19 RC 기반)
 
 ## User Guide
 

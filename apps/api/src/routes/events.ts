@@ -7,6 +7,15 @@ import { HttpError } from '../utils/errors';
 
 export const router = Router();
 
+router.get('/', requireAuth, async (req, res, next) => {
+  try {
+    const events = await prisma.event.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(events);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/', requireAuth, async (req, res, next) => {
   try {
     const parsed = EventCreateSchema.safeParse(req.body);
@@ -18,6 +27,31 @@ router.post('/', requireAuth, async (req, res, next) => {
     });
     setAuditMeta(req, { entityType: 'Event', entityId: event.id });
     res.json(event);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/:eventId', requireAuth, async (req, res, next) => {
+  try {
+    const eventId = req.params.eventId;
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      include: { participants: { include: { memberTerm: { include: { member: true } } } } }
+    });
+    if (!event) throw new HttpError(404, 'Event not found');
+    res.json({
+      id: event.id,
+      termId: event.termId,
+      title: event.title,
+      type: event.type,
+      createdAt: event.createdAt,
+      participants: event.participants.map((p: any) => ({
+        memberStudentId: p.memberTerm.memberStudentId,
+        name: p.memberTerm.member.name,
+        phone: p.memberTerm.member.phone
+      }))
+    });
   } catch (err) {
     next(err);
   }

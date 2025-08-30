@@ -8,7 +8,10 @@ import { router as importRouter } from './routes/import-v1';
 import { router as termsRouter } from './routes/terms';
 import { router as teamsRouter } from './routes/teams';
 import { router as attendanceRouter } from './routes/attendance';
+import { router as eventsRouter } from './routes/events';
+import { router as auditRouter } from './routes/audit';
 import { HttpError } from './utils/errors';
+import { auditMiddleware } from './middleware/audit';
 
 dotenv.config();
 
@@ -16,6 +19,7 @@ const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(auditMiddleware);
 
 app.use('/auth', authRouter);
 app.use('/members', membersRouter);
@@ -23,6 +27,8 @@ app.use('/import', importRouter);
 app.use('/terms', termsRouter);
 app.use('/', teamsRouter);
 app.use('/', attendanceRouter);
+app.use('/events', eventsRouter);
+app.use('/audit-logs', auditRouter);
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });

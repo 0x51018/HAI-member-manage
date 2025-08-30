@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import apiFetch from '../../lib/api';
-import { ImportResultSchema } from '@packages/types';
+import { ImportResultSchema, TermSchema } from '@packages/types';
 import { z } from 'zod';
 
 interface ParsedCsv {
@@ -30,6 +31,17 @@ export default function ImportPage() {
   const [preview, setPreview] = useState<ParsedCsv | null>(null);
   const [result, setResult] = useState<z.infer<typeof ImportResultSchema> | null>(null);
   const [reportUrl, setReportUrl] = useState<string | null>(null);
+  const [termId, setTermId] = useState('');
+  const [terms, setTerms] = useState<z.infer<typeof TermSchema>[]>([]);
+
+  useEffect(() => {
+    async function loadTerms() {
+      const res = await apiFetch('/terms');
+      const json = await res.json();
+      setTerms(z.array(TermSchema).parse(json));
+    }
+    loadTerms();
+  }, []);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -43,11 +55,11 @@ export default function ImportPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!preview) return;
+    if (!preview || !termId) return;
     const res = await apiFetch('/import/spreadsheet/v1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rows: preview.rows })
+      body: JSON.stringify({ termId, rows: preview.rows })
     });
     const json = await res.json();
     const data = ImportResultSchema.parse(json);
@@ -59,10 +71,23 @@ export default function ImportPage() {
   return (
     <div>
       <h1>Import Members</h1>
+      <p>
+        업로드할 학기를 선택하세요. 학기를 지정하지 않으면 요청이 실패하며 400 오류가
+        발생합니다. 학기 목록은 <Link href="/terms">Terms 페이지</Link>에서 확인할 수
+        있습니다.
+      </p>
       <p>전화번호는 하이픈 없이 숫자만 입력해 주세요.</p>
       <form onSubmit={handleSubmit}>
+        <select value={termId} onChange={(e) => setTermId(e.target.value)} required>
+          <option value="">학기 선택</option>
+          {terms.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.year}-{t.semester}
+            </option>
+          ))}
+        </select>
         <input type="file" accept=".csv" onChange={handleFile} />
-        <button type="submit" disabled={!preview}>
+        <button type="submit" disabled={!preview || !termId}>
           업로드
         </button>
       </form>

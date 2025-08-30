@@ -12,10 +12,19 @@ router.use(requireAuth);
 
 router.post('/spreadsheet/v1', async (req, res, next) => {
   try {
+    const termId =
+      typeof req.body.termId === 'string'
+        ? req.body.termId
+        : typeof req.query.termId === 'string'
+        ? (req.query.termId as string)
+        : undefined;
+    if (!termId) throw new HttpError(400, 'termId is required');
+
+    const term = await prisma.term.findUnique({ where: { id: termId } });
+    if (!term) throw new HttpError(400, 'Term not found');
+
     const parsed = ImportRequestSchema.safeParse(req.body);
     if (!parsed.success) throw new HttpError(400, 'Invalid body', undefined, parsed.error.flatten());
-    const term = await prisma.term.findUnique({ where: { year_semester: { year: 2025, semester: 'S1' } } });
-    if (!term) throw new HttpError(400, 'Default term not found');
 
     const counts = {
       created: { members: 0 },

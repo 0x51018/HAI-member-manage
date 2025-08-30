@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: club
+    ports: ["3306:3306"]
+    volumes: ["mysql_data:/var/lib/mysql"]
+  api:
+    build: ../apps/api
+    env_file: ../infra/.env.example.api
+    depends_on: [db]
+    ports: ["8000:8000"]
+    volumes: ["../apps/api:/usr/src/app"]
+  web:
+    build: ../apps/web
+    env_file: ../infra/.env.example.web
+    depends_on: [api]
+    ports: ["3000:3000"]
+    volumes: ["../apps/web:/usr/src/app"]
+volumes:
+  mysql_data: {}

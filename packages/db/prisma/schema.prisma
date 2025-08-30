@@ -1,0 +1,191 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "mysql"; url = env("DATABASE_URL") }
+
+enum Role { ADMIN STAFF }
+enum UserStatus { ACTIVE SUSPENDED }
+enum MemberStatus { ACTIVE INACTIVE ALUMNI }
+enum TeamRole { LEADER MEMBER }
+enum AttendanceStatus { PRESENT LATE ABSENT EXCUSED }
+enum MemoSensitivity { NORMAL CAUTION PRIVATE }
+enum Semester { S1 S2 }
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String?
+  role         Role       @default(STAFF)
+  status       UserStatus @default(ACTIVE)
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  sessions     Session[]
+  auditLogs    AuditLog[] @relation("AuditActor")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  refreshHash  String
+  deviceLabel  String?
+  userAgent    String?
+  ip           String?
+  lastUsedAt   DateTime @default(now())
+  expiresAt    DateTime
+  @@index([userId])
+}
+
+model Member {
+  studentId String       @id
+  name      String
+  phone     String?
+  email     String?
+  department String?
+  honorary  Boolean      @default(false)
+  note      String?
+  status    MemberStatus @default(ACTIVE)
+  joinedAt  DateTime?
+  createdAt DateTime     @default(now())
+  terms     MemberTerm[]
+  memos     Memo[]
+}
+
+model Term {
+  id        String   @id @default(cuid())
+  year      Int
+  semester  Semester
+  sections  Section[]
+  meetings  MeetingDay[]
+  members   MemberTerm[]
+  @@unique([year, semester])
+}
+
+model MeetingDay {
+  id       String  @id @default(cuid())
+  term     Term    @relation(fields: [termId], references: [id])
+  termId   String
+  ordinal  Int
+  date     DateTime
+  label    String?
+  @@unique([termId, ordinal])
+}
+
+model Section {
+  id        String   @id @default(cuid())
+  term      Term     @relation(fields: [termId], references: [id])
+  termId    String
+  name      String
+  teams     Team[]
+  sessions  AttendanceSession[]
+  managers  SectionManager[]
+  @@unique([termId, name])
+}
+
+model Team {
+  id         String  @id @default(cuid())
+  section    Section @relation(fields: [sectionId], references: [id])
+  sectionId  String
+  teamNumber Int
+  name       String?
+  leader     MemberTerm? @relation("TeamLeader", fields: [leaderMemberTermId], references: [id])
+  leaderMemberTermId String?
+  members    MemberTerm[] @relation("TeamMembers")
+  @@unique([sectionId, teamNumber])
+}
+
+model MemberTerm {
+  id           String   @id @default(cuid())
+  member       Member   @relation(fields: [memberStudentId], references: [studentId])
+  memberStudentId String
+  term         Term     @relation(fields: [termId], references: [id])
+  termId       String
+  section      Section? @relation(fields: [sectionId], references: [id])
+  sectionId    String?
+  team         Team?    @relation(fields: [teamId], references: [id])
+  teamId       String?
+  teamRole     TeamRole?
+  isExecutive  Boolean  @default(false)
+  onBreak      Boolean  @default(false)
+  isNewJoiner  Boolean  @default(false)
+  active       Boolean  @default(true)
+  attendances  AttendanceRecord[]
+  @@unique([memberStudentId, termId])
+}
+
+model AttendanceSession {
+  id           String      @id @default(cuid())
+  section      Section     @relation(fields: [sectionId], references: [id])
+  sectionId    String
+  meetingDay   MeetingDay  @relation(fields: [meetingDayId], references: [id])
+  meetingDayId String
+  createdBy    String
+  createdAt    DateTime    @default(now())
+  records      AttendanceRecord[]
+  @@unique([sectionId, meetingDayId])
+}
+
+model AttendanceRecord {
+  id           String            @id @default(cuid())
+  session      AttendanceSession @relation(fields: [sessionId], references: [id])
+  sessionId    String
+  memberTerm   MemberTerm        @relation(fields: [memberTermId], references: [id])
+  memberTermId String
+  status       AttendanceStatus
+  markedBy     String
+  markedAt     DateTime          @default(now())
+  @@unique([sessionId, memberTermId])
+}
+
+model Memo {
+  id          String          @id @default(cuid())
+  member      Member          @relation(fields: [memberStudentId], references: [studentId])
+  memberStudentId String
+  author      User            @relation(fields: [authorId], references: [id])
+  authorId    String
+  body        String
+  sensitivity MemoSensitivity @default(NORMAL)
+  term        Term?           @relation(fields: [termId], references: [id])
+  termId      String?
+  createdAt   DateTime        @default(now())
+}
+
+model SectionManager {
+  id        String  @id @default(cuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  section   Section @relation(fields: [sectionId], references: [id])
+  sectionId String
+  @@unique([userId, sectionId])
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  term       Term?    @relation(fields: [termId], references: [id])
+  termId     String?
+  title      String
+  type       String?
+  createdBy  String
+  createdAt  DateTime @default(now())
+  participants EventParticipant[]
+}
+
+model EventParticipant {
+  id           String  @id @default(cuid())
+  event        Event   @relation(fields: [eventId], references: [id])
+  eventId      String
+  memberTerm   MemberTerm @relation(fields: [memberTermId], references: [id])
+  memberTermId String
+  @@unique([eventId, memberTermId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     User?    @relation("AuditActor", fields: [actorId], references: [id])
+  actorId   String?
+  action    String
+  entityType String?
+  entityId   String?
+  diff      Json?
+  ip        String?
+  ua        String?
+  at        DateTime @default(now())
+}

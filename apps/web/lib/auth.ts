@@ -10,7 +10,7 @@ const LoginSchema = z.object({
 export type LoginInput = z.infer<typeof LoginSchema>;
 
 export async function login(input: LoginInput) {
-  const base = process.env.NEXT_PUBLIC_API_URL ?? '';
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
   const res = await fetch(`${base}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -26,7 +26,7 @@ export async function login(input: LoginInput) {
 }
 
 export async function logout() {
-  const base = process.env.NEXT_PUBLIC_API_URL ?? '';
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
   await fetch(`${base}/auth/logout`, { method: 'POST', credentials: 'include' });
   setAccessToken(null);
   if (typeof window !== 'undefined') {

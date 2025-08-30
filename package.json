@@ -1,0 +1,14 @@
+{
+  "name": "club-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "1.10.0",
+    "typescript": "5.6.2"
+  }
+}

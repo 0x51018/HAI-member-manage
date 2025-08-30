@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: club
+    volumes: ["mysql_data:/var/lib/mysql"]
+    restart: unless-stopped
+  api:
+    image: club-api:latest
+    env_file: .env.api
+    depends_on: [db]
+    ports: ["8000:8000"]
+    restart: unless-stopped
+  web:
+    image: club-web:latest
+    env_file: .env.web
+    depends_on: [api]
+    ports: ["3000:3000"]
+    restart: unless-stopped
+volumes:
+  mysql_data: {}

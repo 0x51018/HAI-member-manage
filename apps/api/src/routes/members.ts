@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma';
 import { requireAuth } from '../middleware/auth';
 import { MemoCreateSchema } from '@packages/types';
 import { HttpError } from '../utils/errors';
+import { setAuditMeta } from '../middleware/audit';
 
 export const router = Router();
 
@@ -105,6 +106,19 @@ router.post('/:studentId/memos', async (req, res, next) => {
       }
     });
     res.status(201).json(memo);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete('/:studentId/memos/:memoId', async (req, res, next) => {
+  try {
+    const { studentId, memoId } = req.params;
+    const memo = await prisma.memo.findFirst({ where: { id: memoId, memberStudentId: studentId } });
+    if (!memo) throw new HttpError(404, 'Not found');
+    await prisma.memo.delete({ where: { id: memoId } });
+    setAuditMeta(req, { entityType: 'Memo', entityId: memoId });
+    res.status(204).send();
   } catch (err) {
     next(err);
   }

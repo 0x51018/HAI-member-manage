@@ -7,6 +7,7 @@ import { router as membersRouter } from './routes/members';
 import { router as importRouter } from './routes/import-v1';
 import { router as termsRouter } from './routes/terms';
 import { router as teamsRouter } from './routes/teams';
+import { router as attendanceRouter } from './routes/attendance';
 import { HttpError } from './utils/errors';
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.use('/members', membersRouter);
 app.use('/import', importRouter);
 app.use('/terms', termsRouter);
 app.use('/', teamsRouter);
+app.use('/', attendanceRouter);
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });

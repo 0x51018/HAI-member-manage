@@ -1,7 +1,7 @@
 # TODO
 
-- [ ] Add API and web `.env.example` files in `infra` directory.
-- [ ] Implement attendance APIs (session generation, listing, and attendance CRUD) with audit logging.
+- [x] Add API and web `.env.example` files in `infra` directory.
+- [x] Implement attendance APIs (session generation, listing, and attendance CRUD) with audit logging.
 - [ ] Implement events API including participant management and CSV/TXT export.
 - [ ] Implement audit log API and middleware.
 - [ ] Build Next.js pages for login, members, terms, sections, attendance, events, and audit views.

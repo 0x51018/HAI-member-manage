@@ -9,7 +9,7 @@ export function getAccessToken() {
 }
 
 export default async function apiFetch(path: string, options: RequestInit = {}) {
-  const base = process.env.NEXT_PUBLIC_API_URL ?? '';
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
   const headers = new Headers(options.headers);
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
   const res = await fetch(`${base}${path}`, { ...options, headers, credentials: 'include' });

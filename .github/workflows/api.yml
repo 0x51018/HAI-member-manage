@@ -1,0 +1,49 @@
+name: API
+
+on:
+  push:
+    paths:
+      - 'apps/api/**'
+      - 'packages/db/**'
+  pull_request:
+    paths:
+      - 'apps/api/**'
+      - 'packages/db/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: api
+      REGISTRY: ghcr.io/${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - run: pnpm install
+      - run: pnpm build --filter ./apps/api
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker image
+        run: docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} apps/api
+      - name: Push Docker image
+        run: docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            docker pull $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+            docker stop api || true
+            docker rm api || true
+            docker run -d --name api -p 3000:3000 $REGISTRY/$IMAGE_NAME:${{ github.sha }}

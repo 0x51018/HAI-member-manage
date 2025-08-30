@@ -105,6 +105,7 @@ router.post('/:studentId/memos', async (req, res, next) => {
         termId: parse.data.termId || null
       }
     });
+    setAuditMeta(req, { entityType: 'Memo', entityId: memo.id });
     res.status(201).json(memo);
   } catch (err) {
     next(err);

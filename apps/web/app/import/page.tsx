@@ -56,10 +56,21 @@ export default function ImportPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!preview || !termId) return;
+
+    const cleanedRows = preview.rows.map((row) => {
+      const cleaned: Record<string, string> = { ...row };
+      Object.keys(cleaned).forEach((key) => {
+        if (key.includes('전화번호')) {
+          cleaned[key] = cleaned[key].replace(/[^0-9]/g, '');
+        }
+      });
+      return cleaned;
+    });
+
     const res = await apiFetch('/import/spreadsheet/v1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ termId, rows: preview.rows })
+      body: JSON.stringify({ termId, rows: cleanedRows })
     });
     const json = await res.json();
     const data = ImportResultSchema.parse(json);
@@ -76,7 +87,7 @@ export default function ImportPage() {
         발생합니다. 학기 목록은 <Link href="/terms">Terms 페이지</Link>에서 확인할 수
         있습니다.
       </p>
-      <p>전화번호는 하이픈 없이 숫자만 입력해 주세요.</p>
+      <p>전화번호의 하이픈은 자동으로 제거됩니다.</p>
       <form onSubmit={handleSubmit}>
         <select value={termId} onChange={(e) => setTermId(e.target.value)} required>
           <option value="">학기 선택</option>

@@ -77,6 +77,15 @@ repo/
 - `pnpm dev` – API와 웹을 동시에 개발 모드로 실행
 - `pnpm build` – 전체 프로젝트 빌드
 - `pnpm lint` – 각 패키지의 ESLint 실행
+- `pnpm test` – 모든 패키지의 테스트 실행 (`--filter @apps/api` 등으로 개별 실행 가능)
+
+## 테스트 실행
+
+```bash
+pnpm test
+pnpm test --filter @apps/api   # API만 테스트
+pnpm test --filter @apps/web   # Web만 테스트
+```
 
 ## 운영 배포 가이드
 

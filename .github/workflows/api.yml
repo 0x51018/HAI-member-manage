@@ -28,9 +28,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - run: corepack enable
       - run: pnpm install
       - run: pnpm test --filter ./apps/api
       - run: pnpm build --filter ./apps/api

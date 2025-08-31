@@ -7,13 +7,13 @@ services:
     volumes: ["mysql_data:/var/lib/mysql"]
     restart: unless-stopped
   api:
-    image: club-api:latest
+    image: registry.digitalocean.com/hyuhai/api:latest
     env_file: .env.api
     depends_on: [db]
     ports: ["8000:8000"]
     restart: unless-stopped
   web:
-    image: club-web:latest
+    image: registry.digitalocean.com/hyuhai/web:latest
     env_file: .env.web
     depends_on: [api]
     ports: ["3000:3000"]

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TermSchema } from './terms';
 
 export const MemoSchema = z.object({
   id: z.string(),
@@ -23,6 +24,7 @@ export const MemberSummarySchema = z.object({
 export const MemberTermSchema = z.object({
   id: z.string(),
   termId: z.string(),
+  term: TermSchema,
   sectionId: z.string().nullable(),
   teamId: z.string().nullable(),
   teamRole: z.string().nullable(),

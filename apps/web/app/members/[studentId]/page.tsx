@@ -64,6 +64,20 @@ export default function MemberDetailPage({ params }: { params: { studentId: stri
   if (isLoading) return <div>Loading...</div>;
   if (error || !data) return <div>Failed to load</div>;
 
+  const timeline: { date: Date; label: string }[] = [];
+  if (data.joinedAt) {
+    timeline.push({ date: new Date(data.joinedAt), label: 'Joined' });
+  }
+  data.terms.forEach((t) => {
+    const month = t.term.semester === 'S1' ? 2 : 8;
+    const termDate = new Date(t.term.year, month - 1, 1);
+    timeline.push({
+      date: termDate,
+      label: `${t.term.year}-${t.term.semester}`
+    });
+  });
+  timeline.sort((a, b) => a.date.getTime() - b.date.getTime());
+
   return (
     <div>
       <h1>
@@ -71,6 +85,16 @@ export default function MemberDetailPage({ params }: { params: { studentId: stri
       </h1>
       <p>Status: {data.status}</p>
       <p>Phone: {data.phone ?? '-'}</p>
+      <h2>Timeline</h2>
+      <ul>
+        {timeline.map((item, idx) => (
+          <li key={idx}>
+            <time dateTime={item.date.toISOString()}>{item.date.toLocaleDateString()}</time>
+            {' '}
+            {item.label}
+          </li>
+        ))}
+      </ul>
       <h2>Memos</h2>
       <form
         onSubmit={(e) => {

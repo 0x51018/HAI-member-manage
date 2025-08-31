@@ -14,6 +14,12 @@ jobs:
     env:
       IMAGE_NAME: web
       REGISTRY: ghcr.io/${{ github.repository }}
+      DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      SSH_HOST: ${{ secrets.WEB_SSH_HOST }}
+      SSH_USER: ${{ secrets.WEB_SSH_USER }}
+      SSH_KEY: ${{ secrets.WEB_SSH_KEY }}
+      ENV_FILE: ${{ secrets.WEB_ENV_FILE }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,12 +30,13 @@ jobs:
         with:
           version: 8
       - run: pnpm install
+      - run: pnpm test --filter ./apps/web
       - run: pnpm build --filter ./apps/web
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
       - name: Build Docker image
         run: docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} apps/web
       - name: Push Docker image
@@ -37,11 +44,13 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          envs: REGISTRY,IMAGE_NAME,ENV_FILE
           script: |
+            echo "$ENV_FILE" > .env
             docker pull $REGISTRY/$IMAGE_NAME:${{ github.sha }}
             docker stop web || true
             docker rm web || true
-            docker run -d --name web -p 3000:3000 $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+            docker run -d --name web --env-file .env -p 3000:3000 $REGISTRY/$IMAGE_NAME:${{ github.sha }}

@@ -30,8 +30,8 @@ jobs:
           cache: 'pnpm'
       - run: corepack enable
       - run: pnpm install
-      - run: pnpm test --filter ./apps/api
-      - run: pnpm build --filter ./apps/api
+      - run: pnpm test --filter=./apps/api
+      - run: pnpm build --filter=./apps/api
       - uses: docker/login-action@v3
         with:
           registry: registry.digitalocean.com

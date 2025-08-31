@@ -4,3 +4,4 @@ export * from './terms';
 export * from './attendance';
 export * from './events';
 export * from './audit';
+export * from './sessions';

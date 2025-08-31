@@ -106,6 +106,24 @@ pnpm test --filter @apps/web   # Web만 테스트
 
 DigitalOcean Droplet과 Container Registry를 이용한 배포 방법은 [docs/digitalocean.md](docs/digitalocean.md)를 참고하세요.
 
+## 운영자 초기 세팅
+
+1. DigitalOcean에 컨테이너 레지스트리와 Droplet을 생성합니다. 자세한 절차는
+   [docs/digitalocean.md](docs/digitalocean.md)에 정리되어 있습니다.
+2. Droplet에 `.env.api`, `.env.web` 파일을 업로드하고 Docker로 서비스를 실행합니다.
+   ```bash
+   docker compose -f infra/docker-compose.prod.yml up -d
+   ```
+3. 최초 관리자 계정은 다음 명령으로 생성합니다. `ADMIN_EMAIL`과
+   `ADMIN_PASSWORD`를 원하는 값으로 바꾸세요.
+   ```bash
+   ADMIN_EMAIL=admin@example.com \
+   ADMIN_PASSWORD=changeme \
+   pnpm --filter @apps/api db:seed
+   ```
+4. 브라우저에서 웹에 접속하여 위에서 만든 관리자 계정으로 로그인합니다.
+   상단 내비게이션의 **Guide** 페이지에 서비스 사용 방법이 정리되어 있습니다.
+
 ## 라이선스
 
 MIT

@@ -56,11 +56,17 @@ router.get('/:studentId', async (req, res, next) => {
     const member = await prisma.member.findUnique({
       where: { studentId },
       include: {
-        terms: true,
+        terms: { include: { term: true } },
         memos: { orderBy: { createdAt: 'desc' }, take: 5 }
       }
     });
     if (!member) throw new HttpError(404, 'Not found');
+    const terms = member.terms.sort((a, b) => {
+      if (a.term.year === b.term.year) {
+        return a.term.semester.localeCompare(b.term.semester);
+      }
+      return a.term.year - b.term.year;
+    });
     res.json({
       studentId: member.studentId,
       name: member.name,
@@ -69,7 +75,7 @@ router.get('/:studentId', async (req, res, next) => {
       department: member.department,
       status: member.status,
       joinedAt: member.joinedAt,
-      terms: member.terms,
+      terms,
       recentMemos: member.memos
     });
   } catch (err) {

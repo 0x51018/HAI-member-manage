@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <QueryClientProvider client={client}>
           <nav style={{ marginBottom: 16 }}>
-            <Link href="/members">Members</Link> | <Link href="/terms">Terms</Link> | <Link href="/events">Events</Link> | <Link href="/audit">Audit</Link> | <Link href="/settings/sessions">Sessions</Link> | <Link href="/login">Login</Link>
+            <Link href="/members">Members</Link> | <Link href="/terms">Terms</Link> | <Link href="/events">Events</Link> | <Link href="/audit">Audit</Link> | <Link href="/settings/sessions">Sessions</Link> | <Link href="/login">Login</Link> | <Link href="/guide">Guide</Link>
           </nav>
           {children}
         </QueryClientProvider>

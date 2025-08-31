@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: web
-      REGISTRY: ghcr.io/${{ github.repository }}
+      REGISTRY: registry.digitalocean.com/hyuhai
       DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
       SSH_HOST: ${{ secrets.WEB_SSH_HOST }}
@@ -32,7 +32,7 @@ jobs:
       - run: pnpm build --filter ./apps/web
       - uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: registry.digitalocean.com
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
       - name: Build Docker image

@@ -92,8 +92,10 @@ repo/
    ```bash
    docker compose -f infra/docker-compose.prod.yml up -d
    ```
-4. **(옵션) Cloudflare Tunnel**  
+4. **(옵션) Cloudflare Tunnel**
    외부 노출 없이 배포하려면 Cloudflare Tunnel을 통해 3000/8000 포트를 공개합니다.
+
+DigitalOcean Droplet과 Container Registry를 이용한 배포 방법은 [docs/digitalocean.md](docs/digitalocean.md)를 참고하세요.
 
 ## 라이선스
 

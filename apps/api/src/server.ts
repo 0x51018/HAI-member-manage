@@ -10,6 +10,7 @@ import { router as teamsRouter } from './routes/teams';
 import { router as attendanceRouter } from './routes/attendance';
 import { router as eventsRouter } from './routes/events';
 import { router as auditRouter } from './routes/audit';
+import { router as devicesRouter } from './routes/devices';
 import { HttpError } from './utils/errors';
 import { auditMiddleware } from './middleware/audit';
 
@@ -29,6 +30,7 @@ app.use('/', teamsRouter);
 app.use('/', attendanceRouter);
 app.use('/events', eventsRouter);
 app.use('/audit-logs', auditRouter);
+app.use('/devices', devicesRouter);
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });

@@ -13,6 +13,7 @@ RUN corepack enable \
     && pnpm --filter @apps/api prisma:generate
 
 # Copy API source code, build, and prune dev dependencies
+
 COPY apps/api apps/api
 WORKDIR /usr/src/app/apps/api
 RUN pnpm build && pnpm prune --prod

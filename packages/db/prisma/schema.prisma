@@ -7,13 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role { ADMIN STAFF }
-enum UserStatus { ACTIVE SUSPENDED }
-enum MemberStatus { ACTIVE INACTIVE ALUMNI }
-enum TeamRole { LEADER MEMBER }
-enum AttendanceStatus { PRESENT LATE ABSENT EXCUSED }
-enum MemoSensitivity { NORMAL CAUTION PRIVATE }
-enum Semester { S1 S2 }
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  ALUMNI
+}
+
+enum TeamRole {
+  LEADER
+  MEMBER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  ABSENT
+  EXCUSED
+}
+
+enum MemoSensitivity {
+  NORMAL
+  CAUTION
+  PRIVATE
+}
+
+enum Semester {
+  S1
+  S2
+}
 
 model User {
   id           String     @id @default(cuid())

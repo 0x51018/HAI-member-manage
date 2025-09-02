@@ -21,7 +21,7 @@ router.post(
       });
       if (!section) throw new HttpError(404, 'Section not found');
       await prisma.attendanceSession.createMany({
-        data: section.term.meetings.map((m) => ({
+        data: section.term.meetings.map((m: any) => ({
           sectionId,
           meetingDayId: m.id,
           createdBy: user.id
@@ -88,12 +88,12 @@ router.get('/sessions/:sessionId/attendance', requireAuth, async (req, res, next
       include: { memberTerm: true }
     });
     res.json({
-      roster: roster.map((mt) => ({
+      roster: roster.map((mt: any) => ({
         memberStudentId: mt.memberStudentId,
         name: mt.member.name,
         teamNumber: mt.team?.teamNumber ?? null
       })),
-      records: records.map((r) => ({
+      records: records.map((r: any) => ({
         memberStudentId: r.memberTerm.memberStudentId,
         status: r.status
       }))
@@ -143,7 +143,7 @@ router.put('/sessions/:sessionId/attendance', requireAuth, async (req, res, next
       include: { memberTerm: true }
     });
     res.json(
-      records.map((r) => ({
+      records.map((r: any) => ({
         memberStudentId: r.memberTerm.memberStudentId,
         status: r.status
       }))

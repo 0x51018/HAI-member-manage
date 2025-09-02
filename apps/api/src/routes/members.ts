@@ -32,7 +32,7 @@ router.get('/', async (req, res, next) => {
         }
       }
     });
-    const result = members.map((m) => {
+    const result = members.map((m: any) => {
       const mt = m.terms[0];
       return {
         studentId: m.studentId,
@@ -61,7 +61,7 @@ router.get('/:studentId', async (req, res, next) => {
       }
     });
     if (!member) throw new HttpError(404, 'Not found');
-    const terms = member.terms.sort((a, b) => {
+    const terms = member.terms.sort((a: any, b: any) => {
       if (a.term.year === b.term.year) {
         return a.term.semester.localeCompare(b.term.semester);
       }

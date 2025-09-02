@@ -15,7 +15,7 @@ router.get('/', async (req, res, next) => {
       orderBy: { lastUsedAt: 'desc' }
     });
     res.json(
-      sessions.map((s) => ({
+      sessions.map((s: any) => ({
         id: s.id,
         deviceLabel: s.deviceLabel,
         userAgent: s.userAgent,

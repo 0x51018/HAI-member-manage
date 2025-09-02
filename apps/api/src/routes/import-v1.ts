@@ -75,7 +75,7 @@ router.post('/spreadsheet/v1', async (req, res, next) => {
               counts.sections.created++;
             }
             sectionId = section.id;
-            sectionCache[sectionName] = sectionId;
+            sectionCache[sectionName] = sectionId!;
           }
         }
 

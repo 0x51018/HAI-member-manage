@@ -7,7 +7,6 @@ COPY package.json pnpm-workspace.yaml turbo.json ./
 COPY packages ./packages
 COPY apps/api/package.json apps/api/
 
-
 # Install dependencies (including dev) and generate Prisma client
 RUN corepack enable \
     && pnpm install --filter @apps/api... \
@@ -27,7 +26,6 @@ WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=builder /usr/src/app/apps/api/dist ./apps/api/dist
 COPY apps/api/package.json apps/api/
-
 
 WORKDIR /usr/src/app/apps/api
 EXPOSE 8000

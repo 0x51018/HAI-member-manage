@@ -46,7 +46,7 @@ router.post('/:termId/meetings/bulk', async (req, res, next) => {
     if (!parsed.success)
       throw new HttpError(400, 'Invalid body', undefined, parsed.error.flatten());
     await prisma.meetingDay.createMany({
-      data: parsed.data.items.map((i) => ({
+      data: parsed.data.items.map((i: any) => ({
         termId,
         ordinal: i.ordinal,
         date: new Date(i.date),
